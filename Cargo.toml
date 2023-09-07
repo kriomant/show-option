@@ -3,7 +3,11 @@ name = "show-option"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Library for displaying Options"
+license = "MIT"
+homepage = "https://github.com/kriomant/show-option"
+repository = "https://github.com/kriomant/show-option.git"
+documentation = "https://docs.rs/show-option"
 
 [dependencies]
 lazy_format = { version = "2.0.0", optional = true }
