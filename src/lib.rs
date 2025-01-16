@@ -167,6 +167,10 @@ pub trait ShowOption<T> {
     /// // prints "value: set to    20 bytes"
     /// # assert_eq!(format!("value: {}", Some(20).show_formatted_or(|v| lazy_format!("set to {:>5} bytes", v), "none")),
     /// #            "value: set to    20 bytes");
+    /// println!("values: {}", Some(("Hello", 42)).show_formatted_or(|&(v0, v1)| lazy_format!("set to {} {}", v0, v1), "none"));
+    /// // prints "value: set to Hello 42"
+    /// # assert_eq!(format!("value: {}", Some(("Hello", 42)).show_formatted_or(|&(v0, v1)| lazy_format!("set to {} {}", v0, v1), "none")),
+    /// #            "value: set to Hello 42");
     /// ```
     /// 
     /// Also see [`format_option`] macro which provides convenient way to format option value
@@ -179,7 +183,7 @@ pub trait ShowOption<T> {
     /// However, you may use `lazy_format` crate and do:
     /// `Some(20).show_formatted_or(|v| lazy_format!("${}", v), "-")`
     /// 
-    /// `Option`'s inner type and default must implement `Display`, but they may have different types.
+    /// `Option`'s inner type and default may have different types, and only the default needs to directly implement `Display`.
     fn show_formatted_or<'t, F, O>(&'t self, format: F, otherwise: O) -> ShowFormattedOr<'t, T, F, O>;
 }
 
@@ -286,7 +290,7 @@ pub struct ShowFormattedOr<'t, T, F, O> {
     otherwise: O,
 }
 
-impl<'t, T: Display, D: 't + Display, F: Fn(&'t T) -> D, O: Display> Display for ShowFormattedOr<'t, T, F, O> {
+impl<'t, T, D: 't + Display, F: Fn(&'t T) -> D, O: Display> Display for ShowFormattedOr<'t, T, F, O> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let Some(value) = self.option else {
             return self.otherwise.fmt(f);
@@ -306,6 +310,9 @@ impl<'t, T: Display, D: 't + Display, F: Fn(&'t T) -> D, O: Display> Display for
 /// println!("value: {}", format_option!(Some(20), "set to {} bytes", "none"));
 /// # assert_eq!(format!("value: {}", format_option!(Some(20), "set to {} bytes", "none")),
 /// #            "value: set to 20 bytes");
+/// println!("values: {}", format_option!(Some([1, 20, 42]), "set to {:?}", "none"));
+/// # assert_eq!(format!("values: {}", format_option!(Some([1, 20, 42]), "set to {:?}", "none")),
+/// #            "values: set to [1, 20, 42]");
 /// ```
 /// 
 /// # Details
